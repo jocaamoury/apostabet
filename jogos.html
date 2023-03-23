@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Informações dos jogos</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        padding: 30px;
+      }
+
+      h1,
+      h2 {
+        text-align: center;
+      }
+
+      form {
+        margin-bottom: 30px;
+      }
+
+      label {
+        display: block;
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        margin-bottom: 10px;
+        width: 100%;
+      }
+
+      input[type="submit"] {
+        display: block;
+        margin: 20px auto;
+        width: 100%;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #ccc;
+      }
+
+      th {
+        background-color: #eee;
+      }
+
+      .table-responsive {
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Informações dos jogos</h1>
+      <form class="form" onsubmit="inserirInformacoes(event)">
+        <h2>Inserir informações dos jogos</h2>
+        <div class="form-group">
+          <label>Time:</label>
+          <input type="text" name="time" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Resultado do jogo:</label>
+          <input type="text" name="resultado" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Número de escanteios no 1º tempo:</label>
+          <input type="number" name="escanteios1" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Número de escanteios no 2º tempo:</label>
+          <input type="number" name="escanteios2" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Número de cartões no 1º tempo:</label>
+          <input type="number" name="cartoes1" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Número de cartões no 2º tempo:</label>
+          <input type="number" name="cartoes2" class="form-control" />
+        </div>
+
+        <input
+          type="submit"
+          value="Inserir informações"
+          class="btn btn-primary"
+        />
+      </form>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Resultado</th>
+              <th>Escanteios 1º tempo</th>
+              <th>Escanteios 2º tempo</th>
+              <th>Total de escanteios</th>
+              <th>Cartões 1º tempo</th>
+              <th>Cartões 2º tempo</th>
+              <th>Total de cartões</th>
+              <th>Média de escanteios nos últimos 3 jogos</th>
+              <th>Média de cartões nos últimos 3 jogos</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaJogos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      let times = [];
+
+      function inserirInformacoes(event) {
+        event.preventDefault();
+
+        let time = event.target.time.value;
+        let resultado = event.target.resultado.value;
+        let escanteios1 = parseInt(event.target.escanteios1.value);
+        let escanteios2 = parseInt(event.target.escanteios2.value);
+        let escanteiosTotal = escanteios1 + escanteios2;
+        let cartoes1 = parseInt(event.target.cartoes1.value);
+        let cartoes2 = parseInt(event.target.cartoes2.value);
+        let cartoesTotal = cartoes1 + cartoes2;
+
+        let novoJogo = {
+          resultado: resultado,
+          escanteios1: escanteios1,
+          escanteios2: escanteios2,
+          escanteiosTotal: escanteiosTotal,
+          cartoes1: cartoes1,
+          cartoes2: cartoes2,
+          cartoesTotal: cartoesTotal,
+        };
+
+        let timeEncontrado = false;
+
+        for (let i = 0; i < times.length; i++) {
+          if (times[i].time === time) {
+            times[i].jogos.push(novoJogo);
+            timeEncontrado = true;
+            break;
+          }
+        }
+
+        if (!timeEncontrado) {
+          let novoTime = {
+            time: time,
+            jogos: [novoJogo],
+          };
+          times.push(novoTime);
+        }
+
+        event.target.reset();
+
+        atualizarTabela();
+      }
+
+      function atualizarTabela() {
+  let tabela = document.getElementById("tabelaJogos");
+  tabela.innerHTML = "";
+
+  for (let i = 0; i < times.length; i++) {
+    let tr = document.createElement("tr");
+    let tdTime = document.createElement("td");
+    tdTime.textContent = times[i].time;
+    tr.appendChild(tdTime);
+
+    let tdResultado = document.createElement("td");
+    tdResultado.textContent =
+      times[i].jogos[times[i].jogos.length - 1].resultado;
+    tr.appendChild(tdResultado);
+
+    let tdEscanteios1 = document.createElement("td");
+    tdEscanteios1.textContent =
+      times[i].jogos[times[i].jogos.length - 1].escanteios1;
+    tr.appendChild(tdEscanteios1);
+
+    let tdEscanteios2 = document.createElement("td");
+    tdEscanteios2.textContent =
+      times[i].jogos[times[i].jogos.length - 1].escanteios2;
+    tr.appendChild(tdEscanteios2);
+
+    let tdEscanteiosTotal = document.createElement("td");
+    tdEscanteiosTotal.textContent =
+      times[i].jogos[times[i].jogos.length - 1].escanteiosTotal;
+    tr.appendChild(tdEscanteiosTotal);
+
+    let tdCartoes1 = document.createElement("td");
+    tdCartoes1.textContent =
+      times[i].jogos[times[i].jogos.length - 1].cartoes1;
+    tr.appendChild(tdCartoes1);
+
+    let tdCartoes2 = document.createElement("td");
+    tdCartoes2.textContent =
+      times[i].jogos[times[i].jogos.length - 1].cartoes2;
+    tr.appendChild(tdCartoes2);
+
+    let tdCartoesTotal = document.createElement("td");
+    tdCartoesTotal.textContent =
+      times[i].jogos[times[i].jogos.length - 1].cartoesTotal;
+    tr.appendChild(tdCartoesTotal);
+
+    let tdMediaEscanteios = document.createElement("td");
+    tdMediaEscanteios.textContent = calcularMedia(
+      times[i].jogos.slice(-3).map((jogo) => jogo.escanteiosTotal)
+    ).toFixed(2);
+    tr.appendChild(tdMediaEscanteios);
+
+    let tdMediaCartoes = document.createElement("td");
+    tdMediaCartoes.textContent = calcularMedia(
+      times[i].jogos.slice(-3).map((jogo) => jogo.cartoesTotal)
+    ).toFixed(2);
+    tr.appendChild(tdMediaCartoes);
+
+    tabela.appendChild(tr);
+  }
+}
+
+
+      function calcularMedia(valores) {
+        let soma = 0;
+        for (let i = 0; i < valores.length; i++) {
+          soma += valores[i];
+        }
+        return soma / valores.length;
+      }
+
+      tabela.appendChild(tr);
+    </script>
+  </body>
+</html>
+```
